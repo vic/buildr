@@ -147,9 +147,10 @@ module URI
         # worse than not having a file at all, so download to temporary
         # file and then move over.
         modified = File.stat(target).mtime if File.exist?(target)
-        temp = Tempfile.new(File.basename(target))
+        tmpdir = (options || {}).delete(:tmpdir) || Dir::tmpdir
+        temp = Tempfile.new(File.basename(target), tmpdir)
         temp.binmode
-        read({:progress=>verbose}.merge(options || {}).merge(:modified=>modified)) { |chunk| temp.write chunk }
+        read({:progress=>verbose}.merge(options || {}).merge(:modified=>modified, :tmpdir => tmpdir)) { |chunk| temp.write chunk }
         temp.close
         mkpath File.dirname(target)
         mv temp.path, target
@@ -538,7 +539,7 @@ module URI
 
     def write_internal(options, &block) #:nodoc:
       raise ArgumentError, 'Either you\'re attempting to write a file to another host (which we don\'t support), or you used two slashes by mistake, where you should have file:///<path>.' if host
-      temp = Tempfile.new(File.basename(path))
+      temp = Tempfile.new(File.basename(path), options[:tmpdir] || Dir::tmpdir)
       temp.binmode
       with_progress_bar options[:progress] && options[:size], path.split('/'), options[:size] || 0 do |progress|
         while chunk = yield(RW_CHUNK_SIZE)

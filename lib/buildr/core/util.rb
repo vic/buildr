@@ -16,6 +16,7 @@
 
 require 'rbconfig'
 require 'pathname'
+require 'tmpdir'
 autoload :Tempfile, 'tempfile'
 autoload :YAML, 'yaml'
 autoload :REXML, 'rexml/document'
@@ -154,6 +155,40 @@ module Buildr
       end
 
     end # Gems
+
+    # Utility class for creating temporary directories.
+    # A TempDir gets removed (rm_rf) by a finalizer when ruby gc this object.
+    class TempDir #:nodoc:
+
+      attr_reader :path
+      alias_method :to_s, :path
+
+      # Parent directory given as second argument must exist and be writable.
+      def initialize(basename, tmpdir = nil)
+        tmpdir ||= Dir::tmpdir
+        fail "#{tmpdir} must be a writable directory" unless File.directory?(tmpdir) && File.writable?(tmpdir)
+        dirname = sprintf('%s_%d_%d', basename, $$, object_id.abs)
+        @path = File.join(tmpdir, dirname)
+        old_critical = Thread.critical
+        begin
+          Thread.critical = true
+          FileUtils.mkdir(path)
+          ObjectSpace.define_finalizer(self, lambda { unlink })
+        ensure
+          Thread.critical = old_critical
+        end
+      end
+
+      def remove!
+        unlink
+        ObjectSpace.undefine_finalizer(self)
+      end
+
+      def unlink
+        FileUtils.rm_r(path, :force => true)
+      end
+      
+    end
 
   end # Util
 end

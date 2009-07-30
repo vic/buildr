@@ -356,8 +356,14 @@ module Buildr
       fail 'No remote repositories defined!' if remote.empty?
       exact_success = remote.find do |repo_url|
         begin
+          tmpdir = Dir::tmpdir
+          # Fix for BUILDR-287, BUILDR-292. Remove this when JRUBY-3381 gets resolved.
+          if RUBY_PLATFORM[/java/] && Config::CONFIG['host_os'][/linux/] &&
+              File.stat(tmpdir).dev != File.stat(File.dirname(Buildr.repositories.local)).dev
+            tmpdir = Buildr::Util::TempDir.new('.download', Buildr.repositories.local)
+          end
           path = "#{group_path}/#{id}/#{version}/#{File.basename(name)}"
-          URI.download repo_url + path, name
+          URI.download repo_url + path, name, :tmpdir => tmpdir.to_s
           true
         rescue URI::NotFoundError
           false
