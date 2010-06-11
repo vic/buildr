@@ -44,7 +44,7 @@ def install_gem(name, options = {})
     end
 
     args << '--source' << options[:source] if options[:source]
-    args << '--source' << 'http://gems.rubyforge.org'
+    args << '--source' << 'http://rubygems.org'
     args << '--install-dir' << ENV['GEM_HOME'] if ENV['GEM_HOME']
     sh *args
   end
