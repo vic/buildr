@@ -15,3 +15,5 @@ nbproject
 buildr.iml
 libs
 *.rbc
+.#*
+*#
