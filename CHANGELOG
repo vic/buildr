@@ -1,6 +1,37 @@
-1.4.1 (pending)
-* Changed: BUILDR-459 Update gemspec to accept json_pure ~> 1.4.3
+1.4.2 (pending)
+* Added:  BUILDR-415 Ability to exclude tests from command line
+* Change: BUILDR-473 Update jruby-openssl dependency version or support a range of versions
+* Change: BUILDR-478 Upgrade to net-ssh 2.0.23 and net-sftp 2.0.4 (Shane Witbeck)
+* Change: BUILDR-475 Support for long names on tar.gz (updated to minitar 0.5.3)
+* Change: BUILDR-484 Upgrade to Scala 2.8.0 (final) and associated dependencies
+          (ScalaCheck 1.7, ScalaTest 1.2, Specs 1.6.5)
+* Fixed:  BUILDR-144 Filter does not preserve file permissions
+* Fixed:  BUILDR-163 cobertura-check
+* Fixed:  BUILDR-203 Compiler guessing very inefficient
+* Fixed:  BUILDR-225 ArchiveTask#merge, not according to doc
+* Fixed:  BUILDR-256 Automatically installing gems aborts rspec test runner (Rhett Sutphin)
+* Fixed:  BUILDR-302 Move out-of-date Nailgun documentation to wiki (Shane Witbeck)
+* Fixed:  BUILDR-317 ecj compiler
+* Fixed:  BUILDR-326 follow up: binary safe untarring on Windows (Sam Hendley)
+* Fixed:  BUILDR-342 The jruby gem installer invokes the removed Gem.manage_gems function (Rhett Sutphin)
+* Fixed:  BUILDR-436 release task should only replace "-SNAPSHOT" (spec from Jean-Philippe Caruana)
+* Fixed:  BUILDR-438 Release Task: customizable version numbers (Alexis Midon)
+* Fixed:  BUILDR-464 Improve the versioning of Buildr (Rhett Sutphin)
+* Fixed:  BUILDR-466 Rendering issue with IE on the website (Shane Witbeck)
+* Fixed:  BUILDR-468 test:failed does not respect test.exclude
+* Fixed:  BUILDR-469 test:failed causes all transitive tests to run
+* Fixed:  BUILDR-472 ECJ dependency now required to build any java project
+* Fixed:  BUILDR-479 Enforce using a minimal version of jruby
+* Fixed:  BUILDR-481 Antwrap monkey-patching in core.rb
 
+1.4.1 (2010-07-07)
+* Added:  BUILDR-420 Support external compiler
+* Added:  BUILDR-425 Specify dev dependencies in .gemspec
+* Change: BUILDR-459 Update gemspec to accept json_pure ~> 1.4.3
+* Fixed:  BUILDR-455 cc_spec.rb l 160 depends on time and thus fails intermittently
+* Fixed:  BUILDR-461 Packages with different ids collide
+* Fixed:  BUILDR-439 "The command line is too long" when running TestNG tests
+* Fixed:  BUILDR-463 Setting a system property in the buildfile causes a NoClassDefFoundError
 
 1.4.0 (2010-06-18)
 * Added:  BUILDR-405 Enhance the idea7x extension to supply a task to delete generated files
@@ -9,16 +40,16 @@
 * Added:  Support for Scala 2.8 compiler-level change detection and dependency
           tracking
 * Added:  Continuous compilation
-* Added:  Generic documentation framework (using the `doc` task).  Replaces 
+* Added:  Generic documentation framework (using the `doc` task).  Replaces
           `javadoc` task
 * Added:  New "test:failed" task to execute only tests that failed during last
           run (Antoine Toulme)
 * Added:  Project extensions (before/after_define) now support dependency ordering
           similar to Rake (e.g. before_define(:my_setup => :compile)
-* Added:  BUILDR-328 Detect Eclipse plugin project with META-INF/MANIFEST.MF 
+* Added:  BUILDR-328 Detect Eclipse plugin project with META-INF/MANIFEST.MF
           and Bundle-SymbolicName: entry
 * Added:  Support for Eclipse classpath variables to avoid absolute pathnames in
-          generated .classpath using: 
+          generated .classpath using:
             eclipse.classpath_variables { :VAR => '/path/to/libraries' }
 * Added:  Support for excluding libraries from Eclipse classpath using:
             eclipse.exclude_libs += ['/path/to/some/library.jar']
@@ -28,7 +59,7 @@
           command line (and ignore transitive test dependencies)
 * Added:  ArtifactNamespace.{keys,clear} methods
 * Added:  BUILDR-326 Support unzipping tar.gz files (Antoine Toulme)
-* Added:  BUILDR-368 Support protocol buffer code generation 
+* Added:  BUILDR-368 Support protocol buffer code generation
           (Pepijn Van Eeckhoudt)
 * Added:  BUILDR-375 Buildr now recognizes buildfile.rb and Buildfile.rb
           (Kerry Wilson)
@@ -75,15 +106,15 @@
           (Antoine Toulme)
 * Fixed:  BUILDR-281 Application#initialize fails if home dir isn't writable
 * Fixed:  BUILDR-327 Specifying :plugin eclipse nature explicitly fails
-* Fixed:  BUILDR-330  Install task should re-install artifact even if they 
+* Fixed:  BUILDR-330  Install task should re-install artifact even if they
           already exist (Alexis Midon)
-* Fixed:  BUILDR-334 Eclipse .classpath files use absolute paths for library 
+* Fixed:  BUILDR-334 Eclipse .classpath files use absolute paths for library
           entries (Stefan Wasilewski)
 * Fixed:  BUILDR-336 Java::Commands.java Prints Command Without --trace
           (Antoine Toulme)
 * Fixed:  BUILDR-341 jruby -S extract is no longer supported by jruby
           (Antoine Toulme)
-* Fixed:  BUILDR-344 Buildr::TestFramework::TestResult::YamlFormatter uses 
+* Fixed:  BUILDR-344 Buildr::TestFramework::TestResult::YamlFormatter uses
           deprecated form of example_pending (Rhett Sutphin)
 * Fixed:  BUILDR-345 Improve project documentation (Peter Schröder)
 * Fixed:  BUILDR-346 Test classpath can not be set (Peter Schröder)
@@ -101,7 +132,7 @@
 * Fixed:  BUILDR-365 test task should use test compile dependencies
 * Fixed:  BUILDR-366 Scala dependencies should be lazily loaded into
           Java.classpath
-* Fixed:  BUILDR-373 Package type specific implementations of install, 
+* Fixed:  BUILDR-373 Package type specific implementations of install,
           uninstall and upload are not invoked (Antoine Toulme)
 * Fixed:  BUILDR-374 upload tasks can attempt to upload artifacts multiple times (Pepijn Van Eeckhoudt)
 * Fixed:  BUILDR-379 Ant sql task abruptly terminates buildr
@@ -110,7 +141,7 @@
 * Fixed:  BUILDR-381 JUnit tests on Groovy project fail with
           NoClassDefFoundError: junit/framework/TestCase
 * Fixed:  BUILDR-382 Packages with default spec are not always created correctly
-* Fixed:  BUILDR-383 artifact().from(task_dependency) should not trigger 
+* Fixed:  BUILDR-383 artifact().from(task_dependency) should not trigger
           task_dependency if artifact exists
 * Fixed:  BUILDR-384 Buildr fails with rubygems 1.3.6
 * Fixed:  BUILDR-386 Display JRuby version in buildr -V (Antoine Toulme)
@@ -120,7 +151,7 @@
           task properties (Antoine Toulme, Peter Dettman)
 * Fixed:  BUILDR-306 Cobertura extension does not handle dependencies
           correctly (Pepijn Van Eeckhoudt)
-* Fixed:  BUILDR-398 FileUtils#sh does not work correctly on Windows 
+* Fixed:  BUILDR-398 FileUtils#sh does not work correctly on Windows
           (Pepijn Van Eeckhoudt)
 * Fixed:  BUILDR-399 invoke_with_call_chain does not restore call chain
           correctly (Pepijn Van Eeckhoudt)
@@ -137,7 +168,7 @@
           "false" value
 * Fixed:  BUILDR-404 buildr -V causes exception on JRuby
 * Fixed:  BUILDR-411 fix for RDoc generation
-* Fixed:  BUILDR-417 package_as_javadoc calls deprecated method  
+* Fixed:  BUILDR-417 package_as_javadoc calls deprecated method
           (Pepijn Van Eeckhoudt)
 * Fixed:  BUILDR-412 Gemspec dependencies don't add up - to the point it's not possible to release
 * Fixed:  BUILDR-414 Provide tag_name method on GitRelease as part of API

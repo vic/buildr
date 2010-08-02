@@ -15,6 +15,7 @@
 
 
 require 'buildr/core/common'
+require 'find'
 
 
 module Buildr
@@ -50,7 +51,13 @@ module Buildr
       def compilers
         @compilers ||= []
       end
-
+      
+      private
+      
+      # Only used by our specs.
+      def compilers=(compilers)
+        @compilers = compilers
+      end
     end
 
     # Base class for all compilers, with common functionality.  Extend and over-ride as you see fit
@@ -85,7 +92,15 @@ module Buildr
           paths = task.sources + [sources].flatten.map { |src| Array(project.path_to(:source, task.usage, src.to_sym)) }
           paths.flatten!
           ext_glob = Array(source_ext).join(',')
-          paths.any? { |path| !Dir["#{path}/**/*.{#{ext_glob}}"].empty? }
+          
+          paths.each { |path| 
+            Find.find(path) {|found|
+              if (!File.directory?(found)) && found.match(/.*\.#{Array(source_ext).join('|')}/)
+                return true
+              end
+              } if File.exist? path
+            }
+          false
         end
 
         # Implementations can use this method to specify various compiler attributes.

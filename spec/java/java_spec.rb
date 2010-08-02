@@ -41,6 +41,14 @@ unless RUBY_PLATFORM =~ /java/
       ENV_JAVA.replace @old_env_java
     end
   end
+else
+  describe 'JRuby environment' do
+    it 'should enforce a minimum version of jruby' do
+      check =File.read(File.expand_path('../lib/buildr/java/jruby.rb')).match(/JRUBY_MIN_VERSION.*\n.*JRUBY_MIN_VERSION\n/).to_s
+      check.sub!('JRUBY_VERSION', "'0.0.0'")
+      lambda {  eval(check) }.should raise_error(/JRuby must be at least at version /)
+    end
+  end
 end
 
 

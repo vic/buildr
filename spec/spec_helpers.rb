@@ -23,7 +23,7 @@ unless defined?(SpecHelpers)
   # For testing we use the gem requirements specified on the buildr.gemspec
   spec = Gem::Specification.load(File.expand_path('../buildr.gemspec', File.dirname(__FILE__)))
   # Dependency.version_requirements deprecated in rubygems 1.3.6
-  spec.dependencies.each { |dep| gem dep.name, (dep.respond_to?(:requirement) ? dep.requirement.to_s : dep.version_requirements.to_s) }
+  spec.dependencies.select {|dep| dep.type == :runtime }.each { |dep| gem dep.name, (dep.respond_to?(:requirement) ? dep.requirement.to_s : dep.version_requirements.to_s) }
   
   # Make sure to load from these paths first, we don't want to load any
   # code from Gem library.
@@ -38,7 +38,17 @@ unless defined?(SpecHelpers)
     require path
   end
   require 'buildr'
-
+  # load ecj
+  require 'buildr/java/ecj'
+  #Make ecj appear as a compiler that doesn't apply:
+  class Buildr::Compiler::Ecj
+    class << self
+      def applies_to?(project, task)
+        false
+      end
+    end
+  end
+  
   # Give a chance for plugins to do a few things before requiring the sandbox.
   include SandboxHook if defined?(SandboxHook)
 

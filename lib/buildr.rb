@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-module Buildr
-  VERSION = '1.4.0'.freeze
+unless defined?(Buildr::VERSION)
+  require 'buildr/version'
 end
 
 require 'buildr/core'
