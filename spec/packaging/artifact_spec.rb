@@ -129,6 +129,14 @@ describe Artifact do
     Artifact.list.should include(@classified.to_spec)
     Artifact.list.should include('foo:foo:jar:1.0')
   end
+
+  it 'should accept user-defined string content' do
+    a = artifact(@spec)
+    a.content 'foo'
+    install a
+    lambda { install.invoke }.should change { File.exist?(a.to_s) && File.exist?(repositories.locate(a)) }.to(true)
+    read(repositories.locate(a)).should eql('foo')
+  end
 end
 
 
@@ -286,6 +294,58 @@ describe Repositories, 'remote' do
       and_return { |uri, target, options| write target }
     lambda { artifact('com.example:library:jar:2.1-SNAPSHOT').invoke }.
       should change { File.exist?(File.join(repositories.local, 'com/example/library/2.1-SNAPSHOT/library-2.1-SNAPSHOT.jar')) }.to(true)
+  end
+  
+  it 'should fail resolving m2-style deployed snapshots if a timestamp is missing' do
+    metadata = <<-XML
+    <?xml version='1.0' encoding='UTF-8'?>
+    <metadata>
+      <groupId>com.example</groupId>
+      <artifactId>library</artifactId>
+      <version>2.1-SNAPSHOT</version>
+      <versioning>
+        <snapshot>
+          <buildNumber>8</buildNumber>
+        </snapshot>
+        <lastUpdated>20071012190008</lastUpdated>
+      </versioning>
+    </metadata>
+    XML
+    repositories.remote = 'http://example.com'
+    URI.should_receive(:download).once.with(uri(/2.1-SNAPSHOT\/library-2.1-SNAPSHOT.(jar|pom)$/), anything()).
+      and_return { fail URI::NotFoundError }
+    URI.should_receive(:download).once.with(uri(/2.1-SNAPSHOT\/maven-metadata.xml$/), duck_type(:write)).
+      and_return { |uri, target, options| target.write(metadata) }
+    lambda {
+      lambda { artifact('com.example:library:jar:2.1-SNAPSHOT').invoke }.should raise_error(RuntimeError, /Failed to download/)
+    }.should show_error "No timestamp provided for the snapshot com.example:library:jar:2.1-SNAPSHOT"
+    File.exist?(File.join(repositories.local, 'com/example/library/2.1-SNAPSHOT/library-2.1-SNAPSHOT.jar')).should be_false
+  end
+  
+  it 'should fail resolving m2-style deployed snapshots if a build number is missing' do
+    metadata = <<-XML
+    <?xml version='1.0' encoding='UTF-8'?>
+    <metadata>
+      <groupId>com.example</groupId>
+      <artifactId>library</artifactId>
+      <version>2.1-SNAPSHOT</version>
+      <versioning>
+        <snapshot>
+          <timestamp>20071012.190008</timestamp>
+        </snapshot>
+        <lastUpdated>20071012190008</lastUpdated>
+      </versioning>
+    </metadata>
+    XML
+    repositories.remote = 'http://example.com'
+    URI.should_receive(:download).once.with(uri(/2.1-SNAPSHOT\/library-2.1-SNAPSHOT.(jar|pom)$/), anything()).
+      and_return { fail URI::NotFoundError }
+    URI.should_receive(:download).once.with(uri(/2.1-SNAPSHOT\/maven-metadata.xml$/), duck_type(:write)).
+      and_return { |uri, target, options| target.write(metadata) }
+    lambda {
+      lambda { artifact('com.example:library:jar:2.1-SNAPSHOT').invoke }.should raise_error(RuntimeError, /Failed to download/)
+    }.should show_error "No build number provided for the snapshot com.example:library:jar:2.1-SNAPSHOT"
+    File.exist?(File.join(repositories.local, 'com/example/library/2.1-SNAPSHOT/library-2.1-SNAPSHOT.jar')).should be_false
   end
 
   it 'should handle missing maven metadata by reporting the artifact unavailable' do
@@ -604,9 +664,20 @@ describe Buildr, '#install' do
   end
 
   it 'should install POM alongside artifact' do
+    pom = artifact(@spec).pom
     write @file
     install artifact(@spec).from(@file)
-    lambda { install.invoke }.should change { File.exist?(artifact(@spec).pom.to_s) }.to(true)
+    lambda { install.invoke }.should change { File.exist?(repositories.locate(pom)) }.to(true)
+  end
+
+  it 'should reinstall POM alongside artifact' do
+    pom = artifact(@spec).pom
+    write @file
+    write repositories.locate(pom)
+    sleep 1
+
+    install artifact(@spec).from(@file)
+    lambda { install.invoke }.should change { File.mtime(repositories.locate(pom)) }
   end
 end
 
