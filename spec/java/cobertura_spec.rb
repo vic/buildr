@@ -14,7 +14,7 @@
 # the License.
 
 
-require File.join(File.dirname(__FILE__), 'test_coverage_helper')
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_coverage_helper'))
 Sandbox.require_optional_extension 'buildr/java/cobertura'
 artifacts(Buildr::Cobertura::dependencies).map(&:invoke)
 
@@ -52,6 +52,11 @@ describe Buildr::Cobertura do
         write 'bar/src/main/java/Baz.java', 'public class Baz {}'
         define('foo') { define('bar') }
         task('foo:bar:cobertura:instrument').invoke
+      end
+      
+      it 'should not generate html if projects have no sources' do
+        define('foo') { define('bar') }
+        task('cobertura:html').invoke
       end
     end
 
