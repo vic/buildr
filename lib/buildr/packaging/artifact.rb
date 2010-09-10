@@ -709,7 +709,10 @@ module Buildr
       case spec
       when ArtifactNamespace
         set |= spec.artifacts
-      when Symbol, Hash
+      when Symbol # An artifact name in a namespace
+        art = artifact_ns.fetch(spec)
+        set |= [art].flatten.uniq.map { |s| artifact(s) }
+      when Hash
         set |= [artifact(spec)]
       when /([^:]+:){2,4}/ # A spec as opposed to a file name.
         set |= [artifact(spec)]
